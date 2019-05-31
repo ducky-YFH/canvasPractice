@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>绘制扇形</title>
+	<style>
+		canvas{
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas width="600" height="600">
+		
+	</canvas>
+	<script>
+		var mycanvas = document.querySelector("canvas");
+		var ctx = mycanvas.getContext("2d");
+		var width = ctx.canvas.width;
+		var height = ctx.canvas.height;
+		// 先定好圆心
+		ctx.moveTo(width/2,height/2);
+		ctx.arc(width/2,height/2,150,0,-Math.PI/2,true);
+		ctx.closePath();
+		ctx.fillStyle = 'green';
+		ctx.fill();
+	</script>
+</body>
+</html>

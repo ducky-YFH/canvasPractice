@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>绘制完整饼图</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+<body>
+	<canvas width="600" height="400">
+		
+	</canvas>
+<script>
+	var mycanvas = document.querySelector("canvas");
+	var ctx = mycanvas.getContext("2d");
+	//1.根据数据绘制饼状图
+	//2.绘制标题 从扇形的弧中心伸出一条线，再画一条再横线，再横线上面写文字标题
+	//3.在画布的左上角绘制说明，一个和扇形一样颜色的矩形，旁边就是文字说明
+
+	var pieChart = function(ctx){
+		this.ctx = ctx || document.querySelector("canvas").getContext("2d");
+		this.width = this.ctx.canvas.width;
+		this.height = this.ctx.canvas.height;
+		/*绘制饼图的中心*/
+		this.x0 = this.width / 2 + 60;
+		this.y0 = this.height / 2;
+		/*半径*/
+		this.radius = 150;
+		/*穿出圆那部分线的长度*/
+		this.outLine = 20;
+		/*说明矩形的大小*/
+		this.rectW = 30;
+        this.rectH = 16;
+        this.space = 20;
+	};
+	pieChart.prototype.init = function(data){
+		this.drawPie(data);
+	};
+	pieChart.prototype.drawPie = function(data){
+		var that = this;
+		/*1.转化为弧度*/
+		var new_data = this.transformAngle(data); //data添加多一个属性angle
+		/*1.绘制饼图*/
+		var startAngle = 0;
+		var endAngle = 0;
+		data.forEach( function(item, i) {
+			endAngle += item.angle;
+			that.ctx.beginPath();
+			that.ctx.moveTo(that.x0,that.y0);
+			that.ctx.arc(that.x0,that.y0,that.radius,startAngle,endAngle);
+			var color = that.randomColor();
+			that.ctx.fillStyle = color;
+			that.ctx.fill();
+			// 绘制标题
+			var title = item.title;
+			that.drawTitle(startAngle,item.angle,color,title);
+			startAngle += item.angle;
+			// 绘制说明
+			that.drawDesc(title,i);
+		});
+	};
+	pieChart.prototype.drawTitle = function(startAngle,angle,color,title){
+		/*1.通过圆心点-确定伸出去的线，通过伸出去的点-确定这个线*/
+		/*2.确定伸出去的点，需要确定伸出去的线的长度*/
+		/*3.固定伸出去的线的长度*/
+		/*4.计算每个圆弧的一半超出去的点坐标*/
+		/*5.公式:outX = (r + outLine) * cos(angle)/2  
+			 	outY = (r + outLine) * sin(angle)/2
+		*/
+		var line = this.radius + this.outLine;
+		var lineX = line * Math.cos(startAngle + angle/2);
+		var lineY = line * Math.sin(startAngle + angle/2);
+		var outX = this.x0 + lineX;
+		var outY = this.y0 + lineY;
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.x0,this.y0);
+		this.ctx.lineTo(outX,outY);
+		this.ctx.strokeStyle = color;
+		this.ctx.stroke();
+		/*画文字和下划线*/
+		/*线的方向怎么判断 伸出去的点在x0的左边，线的的方向就向左边*/
+		/*线的方向怎么判断 伸出去的点在x0的右边，线的的方向就向右边*/
+		/*获取文字长度*/
+		this.ctx.font="bold 15px Arial";
+		var textWidth = this.ctx.measureText(title).width;
+		this.ctx.beginPath();
+		this.ctx.moveTo(outX,outY);
+		if(outX > this.x0){
+			this.ctx.lineTo(outX+textWidth,outY);
+			this.ctx.textAlign = "left";
+		}else{
+			this.ctx.lineTo(outX-textWidth,outY);
+			this.ctx.textAlign = "right";
+		}
+		this.ctx.strokeStyle = color;
+		this.ctx.stroke();
+		this.ctx.textBaseline = 'bottom';
+		this.ctx.fillText(title,outX,outY);
+
+	};
+	pieChart.prototype.drawDesc = function(title,index){
+		this.ctx.fillRect(this.space,this.space + index * (this.rectH + 10),this.rectW,this.rectH);
+        /*绘制文字*/
+        this.ctx.beginPath();
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'top';
+        this.ctx.font = '12px Microsoft YaHei';
+        this.ctx.fillText(title,this.space + this.rectW + 10 , this.space + index * (this.rectH + 10));
+	};
+	//把data的数据转换为对应的弧度
+	pieChart.prototype.transformAngle = function(data){
+		var sum = 0;
+		data.forEach( function(item, i) {
+			sum += item.num;
+		});
+		data.forEach( function(item, i) {
+			item.angle = item.num / sum * Math.PI * 2;
+		});
+		return data;
+	};
+	pieChart.prototype.randomColor = function(){
+		var R = Math.floor(Math.random() * 256);
+		var G = Math.floor(Math.random() * 256);
+		var B = Math.floor(Math.random() * 256);
+		var RGB = "rgb("+R+","+G+","+B+")";
+		return RGB;
+	};
+	var data = [
+		{
+			title:'15-20岁',
+			num:50
+		},
+		{
+			title:'20-25岁',
+			num:30
+		},
+		{
+			title:'25-30岁',
+			num:60
+		},
+		{
+			title:'30岁以上',
+			num:8
+		}
+	]
+
+	var Pie = new pieChart();
+	Pie.init(data);
+</script>
+</body>
+</html>

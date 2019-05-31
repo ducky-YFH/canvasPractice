@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>绘制扇形</title>
+	<style>
+		canvas{
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas width="600" height="600">
+		
+	</canvas>
+	<script>
+		var mycanvas = document.querySelector("canvas");
+		var ctx = mycanvas.getContext("2d");
+		var width = ctx.canvas.width;
+		var height = ctx.canvas.height;
+		var x0 = width/2;
+		var y0 = height/2;
+		// 随机获取颜色函数
+		var randomColor = function(){
+			var R = Math.floor(Math.random() * 256);
+			var G = Math.floor(Math.random() * 256);
+			var B = Math.floor(Math.random() * 256);
+			var RGB = "rgb("+R+","+G+","+B+")";
+			return RGB;
+		}
+		// 数据
+		data = [6,30,10,8];
+		var sum = eval(data.join("+"));  //求和
+		var ratioList = [];
+		data.forEach(function(item, i) {
+			ratioList.push(item / sum);
+		});
+		var angle = Math.PI * 2;
+		var startAngle = 0;
+		var endAngle = 0;
+		ratioList.forEach(function(item, i) {
+			endAngle += angle * item;
+			ctx.beginPath();
+			ctx.moveTo(x0,y0);
+			ctx.arc(x0,y0,150,startAngle,endAngle);
+			ctx.fillStyle = randomColor();
+			ctx.fill();
+			startAngle += angle * item;
+		});
+
+	</script>
+</body>
+</html>

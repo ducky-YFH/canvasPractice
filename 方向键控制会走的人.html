@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>方向键控制会走的人</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+<body>
+	<canvas width="600" height="400">
+		
+	</canvas>
+	<script>
+		var personRun = function(ctx){
+			this.ctx = ctx || document.querySelector("canvas").getContext("2d");
+			this.canvasWidth = this.ctx.canvas.width;
+			this.canvasHeight = this.ctx.canvas.height;
+			this.x0 = this.canvasWidth / 2;
+			this.y0 = this.canvasHeight / 2;
+			this.src = "image/03.png";
+			this.index = 0;
+			// 方向
+			this.direction = 0;
+			// x轴步数
+			this.stepX = 0;
+			// y轴步数
+			this.stepY = 0;
+
+		}
+		personRun.prototype.init = function(){
+			var that = this;
+			this.loadImg(function(img){
+				imgWidth = img.width;
+				imgHeight = img.height;
+				that.personWidth = imgWidth / 4;  //不变
+				that.personHeight = imgHeight / 4; //不变
+				// 刚开是的位置
+				that.personX0 = that.x0 - that.personWidth; //会变
+				that.personY0 = that.y0 - that.personHeight; //会变
+				// 默认绘制在中心位置朝外
+				that.ctx.drawImage(
+					this.img,
+					0,0,
+					that.personWidth,that.personHeight,
+					that.personX0,that.personY0,
+					that.personWidth,that.personHeight
+					)
+				// 通过方向键控制人物行走
+				that.index = 0;
+				document.onkeydown = function(e){
+					var keyCode = e.keyCode;
+					//left
+					if(keyCode === 37){
+						that.direction = 1;
+						that.stepX -= 5;
+						that.personGo(img);
+					}else if(keyCode === 38){
+					//up
+						that.stepY -= 5;
+						that.direction = 3;
+						that.personGo(img);
+					}else if(keyCode === 39){
+					//right	
+						that.stepX += 5;
+						that.direction = 2;
+						that.personGo(img);
+					}else if(keyCode === 40){
+					//down
+						that.stepY += 5;
+						that.direction = 0;
+						that.personGo(img);
+					}
+				}
+			});
+		};
+		personRun.prototype.personGo = function(img){
+			//清除画布
+			console.log(this.index);
+			this.ctx.clearRect(0,0,this.canvasWidth,this.canvasHeight);
+			this.ctx.drawImage(
+				img,
+				this.index * this.personWidth,this.direction * this.personHeight,
+				this.personWidth,this.personHeight,
+				this.personX0 + this.stepX,this.personY0 + this.stepY, //动态的获取
+				this.personWidth,this.personHeight);
+			this.index ++;
+			if(this.index > 3){
+				this.index = 0;
+			}
+		}
+		personRun.prototype.loadImg = function(callback){
+			var that = this;
+			img = new Image();
+			img.onload = function(){
+				callback && callback(img);
+			};
+			img.src = this.src;
+		}
+		var woman = new personRun();
+		woman.init();
+	</script>
+</body>
+</html>

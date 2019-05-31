@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		canvas{
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas width="600" height="600">
+		
+	</canvas>
+	<script>
+		var mycanvas = document.querySelector("canvas");
+		var ctx = mycanvas.getContext("2d");
+		var width = ctx.canvas.width;
+		var height = ctx.canvas.height;
+		ctx.arc(width/2,height/2,150,Math.PI,true);
+		ctx.stroke();
+	</script>
+</body>
+</html>
